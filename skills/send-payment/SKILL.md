@@ -101,14 +101,16 @@ The API auto-detects the chain type from the address and returns all token balan
 **Token selection priority:**
 1. If USDC balance on the source chain is sufficient → use USDC
 2. If USDC is insufficient but USDT balance on the source chain is sufficient → use USDT
-3. If neither is sufficient → inform the user and stop:
-   > "Insufficient balance. You have X USDC and Y USDT on [chain] but need Z (amount + fee)."
+3. If neither is sufficient → inform the user and stop
 
 **Note:** USDT payout is only supported on EVM chains (Ethereum, Arbitrum, Base, BSC, Polygon). If the destination is Solana or Stellar and USDC is insufficient, inform the user that only USDC payouts are supported for that chain.
 
-### Step 5: Get Fee Estimate & Confirm Payment Details
+After fetching, tell the user their balance:
+> "Your wallet has [X] USDC and [Y] USDT on [chain]. Using [token] for this payment."
 
-ALWAYS run a dryrun first to get the exact fee before confirming:
+### Step 5: Get Fee & Confirm Payment Details
+
+Before confirming, get the exact fee:
 
 ```bash
 node scripts/dist/create-payment.js \
@@ -121,23 +123,22 @@ node scripts/dist/create-payment.js \
   --dryrun
 ```
 
-The dryrun returns `source.fee` and `feeInfo` (feePercentage, minimumFee) without creating a payment.
-
-Then present a confirmation summary:
+Then present a confirmation summary including the balance and fee:
 
 ```
+Your wallet has [balance] [token] on [source_chain].
+
 Payment Summary:
 - Sending: [amount] [token]
 - To: [destination_address] ([chain_name])
 - From: [source_wallet] ([source_chain])
-- Payment type: exactOut (recipient receives exact amount)
-- Fee: [fee from dryrun] ([feePercentage])
-- Total deducted from your wallet: [amount + fee]
+- Fee: [fee] [token] ([feePercentage])
+- Total deducted: [amount + fee] [token]
 
 Confirm? (yes/no)
 ```
 
-Default payment type is `exactOut`. Only proceed if the user confirms.
+Default payment type is `exactOut` — recipient gets the exact amount, fee is added on top. Only proceed if the user confirms.
 
 ### Step 6: Create Payment
 

@@ -53,8 +53,10 @@ Display the payment details:
 - **Status** (see flow below)
 - **Amount**: source and destination
 - **Fee**
-- **Created / Expires at**
+- **Created / Expires at** — convert UTC timestamps from the API to the user's local timezone
 - **Transaction hashes** (if available)
+
+**Important:** All timestamps from the Rozo API are in UTC. Always convert and display them in the local timezone of the machine (e.g., `new Date(utcString).toLocaleString()`).
 
 ### Payment Status Flow
 

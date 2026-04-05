@@ -1,7 +1,13 @@
 
 .env
 .env.dev
+.DS_Store
 
 CLAUDE.md
 Todo.md
 .gstack/
+
+# scripts build artifacts
+scripts/node_modules/
+scripts/package-lock.json
+scripts/dist/*.d.ts

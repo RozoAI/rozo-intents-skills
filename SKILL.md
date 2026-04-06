@@ -4,19 +4,19 @@ description: >
   Cross-chain crypto payments via the Rozo API. Send USDC/USDT across
   EVM chains (Ethereum, Arbitrum, Base, BSC, Polygon), Solana, and Stellar.
   Use when user says "pay", "send", "transfer", "payout", "check balance",
-  "payment status", "scan QR", or shares a QR code screenshot. Also
+  "payment status", or shares a QR code screenshot. Also
   triggers on wallet addresses (0x, base58, G/C stellar), transaction
   hashes, or payment UUIDs. Auto-detects wallet type, auto-selects token
   (USDC preferred), checks balances, gets fees, and confirms before sending.
   Do NOT use for general blockchain questions or non-payment tasks.
 metadata:
   author: rozo
-  version: 0.2.0
+  version: 1.0.1
 ---
 
 # Rozo Cross-Chain Payments
 
-Send cross-chain crypto payments with the Rozo API. Move USDC or USDT from one supported chain to a recipient on another — EVM chains, Solana, and Stellar.
+Send cross-chain crypto payments and bridiging with the Rozo. Move USDC or USDT to a recipient on another — EVM chains, Solana, and Stellar.
 
 ## Routing
 
@@ -30,7 +30,7 @@ Determine the user's intent and load the matching sub-skill:
 | Check payment status | `skills/payment-status/SKILL.md` | "check payment", "payment status", "where is my payment", "track payment", provides a payment UUID or tx hash |
 
 **Rules:**
-1. If the user shares a QR code AND mentions sending/paying → route to `send-payment` (it handles QR parsing internally)
+1. If the user mentions sending/paying → route to `send-payment` (it handles QR parsing internally)
 2. If the user shares a QR code WITHOUT mentioning payment → route to `parse-qr` first, then offer to send
 3. If the user asks about balance before sending → route to `check-balance`, then continue to `send-payment` if they want to pay
 4. If ambiguous, ask the user what they'd like to do

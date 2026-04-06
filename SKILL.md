@@ -1,12 +1,12 @@
 ---
 name: rozo-intents
 description: >
-  Cross-chain crypto payments via the Rozo API. Send USDC/USDT across
-  EVM chains (Ethereum, Arbitrum, Base, BSC, Polygon), Solana, and Stellar.
+  Cross-chain crypto payments and bridging via Rozo. Send USDC/USDT across
+  Ethereum, Base, BNB Chain, Solana, and Stellar.
   Use when user says "pay", "send", "transfer", "payout", "check balance",
   "payment status", or shares a QR code screenshot. Also
   triggers on wallet addresses (0x, base58, G/C stellar), transaction
-  hashes, or payment UUIDs. Auto-detects wallet type, auto-selects token
+  hashes. Auto-detects wallet type, auto-selects token
   (USDC preferred), checks balances, gets fees, and confirms before sending.
   Do NOT use for general blockchain questions or non-payment tasks.
 metadata:
@@ -14,9 +14,10 @@ metadata:
   version: 1.0.1
 ---
 
-# Rozo Cross-Chain Payments
+# Rozo Cross-Chain Payments / Bridging
 
-Send cross-chain crypto payments and bridiging with the Rozo. Move USDC or USDT to a recipient on another — EVM chains, Solana, and Stellar.
+Send cross-chain crypto payments and bridging via Rozo. Send USDC/USDT across
+  Ethereum, Base, BNB Chain, Solana, and Stellar.
 
 ## Routing
 

@@ -11,7 +11,8 @@ description: >
   Do NOT use for general blockchain questions or non-payment tasks.
 metadata:
   author: rozo
-  version: 1.0.1
+  version: 1.0.2
+  runtime: node
 ---
 
 # Rozo Cross-Chain Payments / Bridging
@@ -61,6 +62,21 @@ Determine the user's intent and load the matching sub-skill:
 | Polygon | Yes | Yes |
 | Solana | Yes | Yes |
 | Stellar | Yes | No |
+
+## Runtime
+
+Requires **Node.js** (ES modules). All scripts in `scripts/dist/` are run with `node`.
+
+## Authentication & Rate Limiting
+
+The Rozo APIs are **public and rate-limited** — no API keys or authentication tokens are required.
+
+| Endpoint | Host | Auth | Notes |
+|----------|------|------|-------|
+| Payment API (create, get, check) | `intentapiv4.rozo.ai` | None (rate-limited) | Main Rozo payment API |
+| Balance API (check balance) | `api-balance.rozo-deeplink.workers.dev` | None (rate-limited) | Rozo balance service (Cloudflare Workers) |
+
+Both hosts are operated by Rozo. The balance endpoint uses a separate Cloudflare Workers deployment for performance.
 
 ## Quick Reference
 

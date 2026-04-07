@@ -2,6 +2,8 @@
 
 Base URL: `https://intentapiv4.rozo.ai/functions/v1/payment-api`
 
+**Authentication:** None required. All endpoints are public and rate-limited.
+
 ## Create Payment
 
 **POST** `/payment-api/`

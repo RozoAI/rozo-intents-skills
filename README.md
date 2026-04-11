@@ -7,6 +7,7 @@ token selection, fee estimation, balance checks, and on-chain execution.
 
 Built as a [Claude Code plugin](https://code.claude.com/docs/en/plugins.md).
 Powered by the [Rozo API](https://apidoc.rozo.ai/).
+Published on [ClawHub](https://clawhub.ai/plugins/rozo-intents).
 
 ## Install
 
@@ -16,6 +17,9 @@ In Claude Code, run:
 /plugin marketplace add RozoAI/rozo-intents-skills
 /plugin install rozo-intents@rozo
 ```
+
+Or install via [ClawHub](https://clawhub.ai/plugins/rozo-intents) if you're
+using an OpenClaw-compatible client.
 
 That's it. No API keys, no env vars — the Rozo APIs are public and
 rate-limited. You just need Node.js available (the plugin's runtime scripts
@@ -81,6 +85,7 @@ threshold, the fee is $0.
 
 ## Links
 
+- ClawHub plugin page: <https://clawhub.ai/plugins/rozo-intents>
 - Docs: <https://docs.rozo.ai>
 - API reference: <https://apidoc.rozo.ai>
 - Supported tokens & chains: <https://docs.rozo.ai/integration/api-doc/supported-tokens-and-chains>

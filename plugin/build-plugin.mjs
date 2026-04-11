@@ -66,6 +66,16 @@ writeRendered(
   renderTemplate(join(REPO_ROOT, 'plugin', 'package.json.tmpl'), substitutions),
 );
 
+// 2c. Render openclaw.plugin.json at the plugin root.
+//     Required by clawhub / openclaw publishing — it's openclaw's native
+//     plugin manifest (distinct from .claude-plugin/plugin.json). Only
+//     `id` and `configSchema` are strictly required; we also include
+//     name / description / version for display.
+writeRendered(
+  join(outDir, 'openclaw.plugin.json'),
+  renderTemplate(join(REPO_ROOT, 'plugin', 'openclaw.plugin.json.tmpl'), substitutions),
+);
+
 // 3. Copy the full skills/ tree (router + sub-skills)
 copyTree(
   join(REPO_ROOT, 'skills'),

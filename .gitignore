@@ -18,4 +18,7 @@ scripts/dist/*.d.ts
 # build/plugin/ — PUBLISHED plugin artifact (referenced by repo-root
 #                 .claude-plugin/marketplace.json via git-subdir). MUST be
 #                 committed so users installing the marketplace can resolve it.
+# dist/         — zip/tar archives for clawhub or other manual uploads;
+#                 regenerable, not committed.
 build/skill/
+dist/

@@ -1,0 +1,22 @@
+{
+  "id": "rozo-intents",
+  "name": "Rozo Intents",
+  "description": "Cross-chain crypto payments and bridging via Rozo. Send USDC/USDT across Ethereum, Base, BNB Chain, Solana, and Stellar.",
+  "version": "1.0.3",
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "freeConfirmThresholdUsd": {
+        "type": "number",
+        "minimum": 0,
+        "description": "USD amount at or below which send-payment auto-executes silently with no confirmation prompt."
+      },
+      "singleConfirmThresholdUsd": {
+        "type": "number",
+        "minimum": 0,
+        "description": "USD amount at or below which send-payment auto-executes with narration (no yes/no). Rozo charges no fee in this range."
+      }
+    }
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "id": "__NAME__",
+  "name": "Rozo Intents",
+  "description": "__DESCRIPTION__",
+  "version": "__VERSION__",
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "freeConfirmThresholdUsd": {
+        "type": "number",
+        "minimum": 0,
+        "description": "USD amount at or below which send-payment auto-executes silently with no confirmation prompt."
+      },
+      "singleConfirmThresholdUsd": {
+        "type": "number",
+        "minimum": 0,
+        "description": "USD amount at or below which send-payment auto-executes with narration (no yes/no). Rozo charges no fee in this range."
+      }
+    }
+  }
+}

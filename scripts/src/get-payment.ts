@@ -64,7 +64,8 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     return idx !== -1 ? args[idx + 1] : undefined;
   };
 
-  const paymentId = get("--payment-id");
+  // --id is a short alias for --payment-id
+  const paymentId = get("--payment-id") ?? get("--id");
   const txHash = get("--tx-hash");
   const receiverAddress = get("--receiver-address");
   const receiverMemo = get("--receiver-memo");
@@ -78,7 +79,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   } else if (receiverAddress && receiverMemo) {
     result = await checkPaymentByAddressMemo(receiverAddress, receiverMemo);
   } else {
-    console.error("Usage: --payment-id <uuid> | --tx-hash <hash> | --receiver-address <addr> --receiver-memo <memo>");
+    console.error("Usage: --payment-id <uuid> | --id <uuid> | --tx-hash <hash> | --receiver-address <addr> --receiver-memo <memo>");
     process.exit(1);
   }
 

@@ -13,6 +13,18 @@ metadata:
 
 # Check Payment Status
 
+## Runtime
+
+All `node scripts/dist/*.js` commands below MUST run from the **plugin root**
+(the directory containing `.claude-plugin/plugin.json`), not from this
+skill's directory. When installed as a Claude Code plugin, the plugin root
+is `${CLAUDE_PLUGIN_ROOT}`. If that env var isn't set, `cd` to the directory
+that contains `scripts/dist/`, `skills/`, and `.claude-plugin/`.
+
+**Do not `sleep` between polls.** Some harnesses block `sleep` in Bash
+commands. If the payment is still processing, just re-run `get-payment.js`
+again — Rozo typically confirms within 10–15 seconds end-to-end.
+
 ## Instructions
 
 Check the status of a Rozo payment. Three lookup methods are supported.
@@ -32,6 +44,8 @@ If none is clear, ask:
 **By payment ID:**
 ```bash
 node scripts/dist/get-payment.js --payment-id <uuid>
+# or, equivalently:
+node scripts/dist/get-payment.js --id <uuid>
 ```
 
 **By source transaction hash:**

@@ -13,6 +13,14 @@ metadata:
 
 # Check Wallet Balance
 
+## Runtime
+
+All `node scripts/dist/*.js` commands below MUST run from the **plugin root**
+(the directory containing `.claude-plugin/plugin.json`), not from this
+skill's directory. When installed as a Claude Code plugin, the plugin root
+is `${CLAUDE_PLUGIN_ROOT}`. If that env var isn't set, `cd` to the directory
+that contains `scripts/dist/`, `skills/`, and `.claude-plugin/`.
+
 ## Instructions
 
 Fetch all USDC and USDT balances for a wallet address using the Rozo balance API.

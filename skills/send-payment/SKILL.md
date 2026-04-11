@@ -15,9 +15,42 @@ metadata:
 
 # Send Cross-Chain Payment
 
+## Runtime
+
+All `node scripts/dist/*.js` commands below MUST run from the **plugin root**
+(the directory containing `.claude-plugin/plugin.json`), not from this
+skill's directory. When installed as a Claude Code plugin, the plugin root
+is `${CLAUDE_PLUGIN_ROOT}`. If that env var isn't set, `cd` to the directory
+that contains `scripts/dist/`, `skills/`, and `.claude-plugin/`.
+
+## Confirmation Thresholds
+
+Read `version.json` at the plugin root for the current thresholds:
+
+- `freeConfirmThresholdUsd` (default `1.0`) — silent auto-execute cutoff
+- `singleConfirmThresholdUsd` (default `10.0`) — narrated auto-execute cutoff
+
+**Behavior matrix** (the amount below is `destAmount` in USD):
+
+| Amount               | Confirmation            | Agent narration              | Dryrun fee check            |
+|----------------------|-------------------------|------------------------------|-----------------------------|
+| `≤ freeConfirm`      | **None** — auto-execute | **Silent** — report only result | **Skip** (fee = 0)       |
+| `≤ singleConfirm`    | **None** — auto-execute | **Narrate** steps, no yes/no    | **Skip** (fee = 0)       |
+| `> singleConfirm`    | **One** yes/no with full details | Full summary + prompt | **Run** `--dryrun` for exact fee |
+
+**Rozo charges no fee for transactions at or below `singleConfirmThresholdUsd`**
+(business rule). For amounts in that range you can skip the `--dryrun` step
+entirely and go straight to `create-payment.js` without `--dryrun`.
+
+**Chain ambiguity is NOT a confirmation question.** If the user gives an EVM
+address without specifying a chain, you MUST ask which chain regardless of
+amount. Wrong chain = lost funds. Only the yes/no confirmation is skipped
+for small amounts, never correctness checks (chain selection, trustline
+check, insufficient balance).
+
 ## Instructions
 
-Process cross-chain crypto payments via the Rozo API. Follow steps sequentially. Do NOT skip confirmation.
+Process cross-chain crypto payments via the Rozo API. Follow steps sequentially.
 
 ### Step 1: Parse Payment Intent
 
@@ -108,22 +141,32 @@ The API auto-detects the chain type from the address and returns all token balan
 After fetching, tell the user their balance:
 > "Your wallet has [X] USDC and [Y] USDT on [chain]. Using [token] for this payment."
 
-### Step 5: Get Fee & Confirm Payment Details
+### Step 5: Fee Estimation & Confirmation (amount-dependent)
 
-Before confirming, get the exact fee:
+Look at the thresholds from the "Confirmation Thresholds" section above.
+
+**If `amount ≤ singleConfirmThresholdUsd`** (default $10):
+- **Skip the dryrun step entirely.** Rozo charges no fee in this range.
+- **Skip the yes/no question.**
+- If `amount ≤ freeConfirmThresholdUsd` (default $1): stay silent, proceed straight to Step 6.
+- If `freeConfirm < amount ≤ singleConfirm`: narrate what you're doing ("Sending 5 USDC on Base to 0x…, no fee, creating payment now…") but do not ask yes/no. Proceed to Step 6.
+
+**If `amount > singleConfirmThresholdUsd`:**
+
+Get the exact fee first via a dryrun:
 
 ```bash
 node scripts/dist/create-payment.js \
-  --source-chain <chain_id> \
+  --source-chain <chain_id_or_name> \
   --source-token <USDC|USDT> \
-  --dest-chain <chain_id> \
+  --dest-chain <chain_id_or_name> \
   --dest-address <address> \
   --dest-token <USDC|USDT> \
   --dest-amount <amount> \
   --dryrun
 ```
 
-Then present a confirmation summary including the balance and fee:
+Then present a full confirmation summary:
 
 ```
 Your wallet has [balance] [token] on [source_chain].
@@ -138,22 +181,61 @@ Payment Summary:
 Confirm? (yes/no)
 ```
 
-Default payment type is `exactOut` — recipient gets the exact amount, fee is added on top. Only proceed if the user confirms.
+Only proceed to Step 6 if the user confirms. Default payment type is
+`exactOut` — recipient gets the exact amount, fee added on top.
 
 ### Step 6: Create Payment
 
 ```bash
 node scripts/dist/create-payment.js \
-  --source-chain <chain_id> \
+  --source-chain <chain_id_or_name> \
   --source-token <USDC|USDT> \
-  --dest-chain <chain_id> \
+  --dest-chain <chain_id_or_name> \
   --dest-address <address> \
   --dest-token <USDC|USDT> \
   --dest-amount <amount> \
   --dest-memo <memo_if_stellar_c_wallet>
 ```
 
-After success, present: Payment ID, Status, Deposit address, any memo required.
+`--source-chain` and `--dest-chain` accept either numeric chain IDs (`8453`,
+`1500`, `900`) or lowercase chain names (`base`, `stellar`, `solana`,
+`ethereum`, `arbitrum`, `bsc`, `polygon`). Use whichever the user gave you.
+
+After success, the API returns a `receiverAddress` and (for Stellar /
+Solana) a `receiverMemo`. **The memo is a routing detail — do not mention
+it to the user unless they ask.** The user should see a clean summary:
+
+```
+Creating payment... done.
+Payment ID: <uuid>
+```
+
+### Step 7: Poll Status Until Complete
+
+Rozo usually confirms end-to-end within 10–15 seconds. Poll with:
+
+```bash
+node scripts/dist/get-payment.js --id <payment_id>
+```
+
+(You can also use `--payment-id <uuid>`, `--tx-hash <hash>`, or
+`--receiver-address <addr> --receiver-memo <memo>` — see the
+`payment-status` sub-skill.)
+
+**Do not use `sleep` between polls** — some harnesses block it. Just re-run
+the command immediately.
+
+Watch for `status` to reach `payment_payout_completed` or `payment_completed`.
+When it does, present a final summary with the destination `txHash` linked
+to the appropriate block explorer (Basescan, Stellar Expert, Solscan, etc.).
+
+For amounts `≤ singleConfirmThresholdUsd`, keep the final report to one or
+two lines:
+
+```
+✓ Sent 0.10 USDC to 0x5772…8897 on Base.
+   tx: https://basescan.org/tx/0x621a…75c3
+```
 
 ## Examples
 

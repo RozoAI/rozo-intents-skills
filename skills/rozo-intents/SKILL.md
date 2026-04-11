@@ -63,6 +63,13 @@ Determine the user's intent and load the matching sub-skill:
 | Solana | Yes | Yes |
 | Stellar | Yes | No |
 
+**Trust the live API over these tables.** Do NOT refuse a user's request
+based purely on the tables above. Tables can be stale or misread — always
+call `create-payment.js --dryrun` first and let the API be the source of
+truth. If dryrun returns `success: true`, the route is supported; if it
+returns an error, report that error to the user. Never tell a user "this
+route isn't supported" without running the dryrun first.
+
 ## Runtime
 
 Requires **Node.js** (ES modules). All scripts in `scripts/dist/` are run with `node`.

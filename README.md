@@ -34,8 +34,18 @@ Once installed, ask Claude Code things like:
 - *(drop in a payment QR screenshot)* → `send this`
 
 The plugin auto-detects the wallet type, prefers USDC when the user doesn't
-specify, confirms details (token, address, amount, fee) before sending, and
-warns you if a Stellar G-wallet is missing a trustline for the asset.
+specify, warns you if a Stellar G-wallet is missing a trustline for the
+asset, and picks a confirmation style based on amount:
+
+- **≤ $1 (default)** — silent auto-execute, one-line result report
+- **≤ $10 (default)** — narrated auto-execute, no yes/no prompt
+- **> $10** — full summary with a single yes/no confirmation
+
+Rozo charges **no fee** for transactions at or below the single-confirm
+threshold. Thresholds are configurable in `version.json`.
+
+Chain correctness questions (e.g. "which EVM chain for this `0x…`
+address?") always block regardless of amount — wrong chain = lost funds.
 
 ## Supported chains
 
@@ -64,8 +74,10 @@ warns you if a Stellar G-wallet is missing a trustline for the asset.
 | Stellar  | ✓    | —    |
 
 **Amount limits:** $0.01 min, $10,000 max per transaction. Payment type is
-`exactOut` by default — the recipient gets the exact amount, and the fee is
-added on top.
+`exactOut` by default — the recipient gets the exact amount. For
+transactions **above** the single-confirm threshold (default $10), the fee
+is added on top of the amount you send; for transactions at or below the
+threshold, the fee is $0.
 
 ## Links
 

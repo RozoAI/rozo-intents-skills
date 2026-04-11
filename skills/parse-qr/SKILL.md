@@ -13,6 +13,14 @@ metadata:
 
 # Parse Payment QR Code
 
+## Runtime
+
+All `node scripts/dist/*.js` commands below MUST run from the **plugin root**
+(the directory containing `.claude-plugin/plugin.json`), not from this
+skill's directory. When installed as a Claude Code plugin, the plugin root
+is `${CLAUDE_PLUGIN_ROOT}`. If that env var isn't set, `cd` to the directory
+that contains `scripts/dist/`, `skills/`, and `.claude-plugin/`.
+
 ## Instructions
 
 Parse QR code content from screenshots or pasted URIs into structured payment data.

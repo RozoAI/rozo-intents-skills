@@ -80,3 +80,24 @@ export function getChainName(chainId: number): string {
 export function isPayoutSupported(chainId: number, token: TokenSymbol): boolean {
   return PAYOUT_TOKENS[token]?.[chainId] !== undefined;
 }
+
+/**
+ * Parse a chain argument that may be either a numeric ID ("8453") or a
+ * case-insensitive chain name ("base", "stellar", "solana", "ethereum",
+ * "arbitrum", "bsc", "polygon"). Returns the numeric chain ID, or null
+ * if the input resolves to neither.
+ */
+export function parseChain(input: string): number | null {
+  const trimmed = input.trim();
+  if (trimmed === "") return null;
+
+  // Numeric path
+  if (/^\d+$/.test(trimmed)) {
+    const id = Number(trimmed);
+    return CHAINS[id] ? id : null;
+  }
+
+  // Name path (case-insensitive)
+  const id = CHAIN_NAME_TO_ID[trimmed.toLowerCase()];
+  return id ?? null;
+}

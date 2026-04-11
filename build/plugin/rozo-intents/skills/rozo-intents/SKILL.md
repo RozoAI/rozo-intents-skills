@@ -11,7 +11,7 @@ description: >
   Do NOT use for general blockchain questions or non-payment tasks.
 metadata:
   author: rozo
-  version: 1.0.2
+  version: 1.0.3
   runtime: node
 ---
 
@@ -62,6 +62,13 @@ Determine the user's intent and load the matching sub-skill:
 | Polygon | Yes | Yes |
 | Solana | Yes | Yes |
 | Stellar | Yes | No |
+
+**Trust the live API over these tables.** Do NOT refuse a user's request
+based purely on the tables above. Tables can be stale or misread — always
+call `create-payment.js --dryrun` first and let the API be the source of
+truth. If dryrun returns `success: true`, the route is supported; if it
+returns an error, report that error to the user. Never tell a user "this
+route isn't supported" without running the dryrun first.
 
 ## Runtime
 

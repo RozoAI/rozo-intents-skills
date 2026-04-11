@@ -1,5 +1,5 @@
 {
-  "version": "1.0.2",
+  "version": "1.0.3",
   "name": "rozo-intents",
   "description": "Cross-chain crypto payments and bridging via Rozo. Send USDC/USDT across Ethereum, Base, BNB Chain, Solana, and Stellar.",
   "author": "rozo",
@@ -7,6 +7,8 @@
   "repository": "https://github.com/RozoAI/rozo-intents-skills.git",
   "pluginSubdir": "build/plugin/rozo-intents",
   "marketplaceName": "rozo",
+  "freeConfirmThresholdUsd": 1.0,
+  "singleConfirmThresholdUsd": 10.0,
   "license": "MIT-0",
   "keywords": [
     "payments",

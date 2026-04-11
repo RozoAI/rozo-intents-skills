@@ -1,0 +1,21 @@
+{
+  "name": "rozo-hub",
+  "owner": {
+    "name": "rozo"
+  },
+  "description": "Rozo plugin marketplace — cross-chain crypto payments via Claude Code",
+  "plugins": [
+    {
+      "name": "rozo-intents",
+      "version": "1.0.2",
+      "description": "Cross-chain crypto payments and bridging via Rozo. Send USDC/USDT across Ethereum, Base, BNB Chain, Solana, and Stellar.",
+      "homepage": "https://rozo.ai",
+      "keywords": ["payments","crypto","usdc","usdt","stellar","solana","evm","bridge","rozo"],
+      "source": {
+        "source": "git-subdir",
+        "url": "https://github.com/RozoAI/rozo-intents-skills.git",
+        "path": "build/plugin/rozo-intents"
+      }
+    }
+  ]
+}

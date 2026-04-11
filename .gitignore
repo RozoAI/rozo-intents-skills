@@ -11,3 +11,11 @@ Todo.md
 scripts/node_modules/
 scripts/package-lock.json
 scripts/dist/*.d.ts
+
+# build outputs
+#
+# build/skill/  — local convenience output, regenerable from source, not shipped
+# build/plugin/ — PUBLISHED plugin artifact (referenced by repo-root
+#                 .claude-plugin/marketplace.json via git-subdir). MUST be
+#                 committed so users installing the marketplace can resolve it.
+build/skill/

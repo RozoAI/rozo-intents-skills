@@ -10,5 +10,15 @@
   "keywords": ["payments","crypto","usdc","usdt","stellar","solana","evm","bridge","rozo"],
   "engines": {
     "node": ">=18"
+  },
+  "openclaw": {
+    "compat": {
+      "pluginApi": ">=2026.3.24-beta.2",
+      "minGatewayVersion": "2026.3.24-beta.2"
+    },
+    "build": {
+      "openclawVersion": "2026.3.24-beta.2",
+      "pluginSdkVersion": "2026.3.24-beta.2"
+    }
   }
 }

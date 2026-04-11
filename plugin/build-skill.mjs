@@ -3,6 +3,7 @@
 //
 // Output layout: build/skill/rozo-intents/
 //   SKILL.md                 (router, version stamped from version.json)
+//   package.json             (declares "type": "module" for scripts/dist/*.js)
 //   skills/                  (sub-skills: send-payment, check-balance, ...)
 //   scripts/dist/            (runtime scripts, .d.ts stripped)
 //   references/              (chain/api/wallet reference docs)
@@ -17,12 +18,16 @@ import {
   loadVersionInfo,
   cleanDir,
   copyTree,
+  renderTemplate,
+  writeRendered,
   stampVersionInFile,
+  substitutionsFrom,
   log,
 } from './build-lib.mjs';
 
 const versionInfo = loadVersionInfo();
 const outDir = join(BUILD_ROOT, 'skill', versionInfo.name);
+const substitutions = substitutionsFrom(versionInfo);
 
 log('skill', `Building ${versionInfo.name}@${versionInfo.version}`);
 log('skill', `Output: ${outDir}`);
@@ -65,5 +70,13 @@ copyTree(
 
 // 7. Stamp __VERSION__ in the router SKILL.md
 stampVersionInFile(join(outDir, 'SKILL.md'), versionInfo.version);
+
+// 8. Render package.json at the skill root so scripts/dist/*.js can be
+//    executed as ES modules. Without "type": "module", Node would reject
+//    the export/import syntax in the compiled scripts.
+writeRendered(
+  join(outDir, 'package.json'),
+  renderTemplate(join(REPO_ROOT, 'plugin', 'package.json.tmpl'), substitutions),
+);
 
 log('skill', 'Done.');

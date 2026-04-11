@@ -1,0 +1,14 @@
+{
+  "name": "rozo-intents",
+  "version": "1.0.2",
+  "description": "Cross-chain crypto payments and bridging via Rozo. Send USDC/USDT across Ethereum, Base, BNB Chain, Solana, and Stellar.",
+  "type": "module",
+  "private": true,
+  "author": "rozo",
+  "license": "MIT-0",
+  "homepage": "https://rozo.ai",
+  "keywords": ["payments","crypto","usdc","usdt","stellar","solana","evm","bridge","rozo"],
+  "engines": {
+    "node": ">=18"
+  }
+}

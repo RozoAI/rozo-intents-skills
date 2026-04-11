@@ -56,6 +56,16 @@ writeRendered(
   renderTemplate(join(REPO_ROOT, 'plugin', 'plugin.json.tmpl'), substitutions),
 );
 
+// 2b. Render a root package.json for the plugin artifact.
+//     Required for two reasons:
+//       (a) scripts/dist/*.js use ES module syntax (import/export), so the
+//           plugin root needs "type": "module" or Node will reject them.
+//       (b) clawhub's publish form requires a package.json at the plugin root.
+writeRendered(
+  join(outDir, 'package.json'),
+  renderTemplate(join(REPO_ROOT, 'plugin', 'package.json.tmpl'), substitutions),
+);
+
 // 3. Copy the full skills/ tree (router + sub-skills)
 copyTree(
   join(REPO_ROOT, 'skills'),

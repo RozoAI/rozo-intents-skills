@@ -76,6 +76,17 @@ writeRendered(
   renderTemplate(join(REPO_ROOT, 'plugin', 'openclaw.plugin.json.tmpl'), substitutions),
 );
 
+// 2d. Render the plugin entry stub at the plugin root.
+//     Declared by openclaw.extensions in package.json. OpenClaw loads
+//     this file at plugin discovery time. For our skill-only plugin
+//     this is a no-op module with a PluginEntry-shaped default export
+//     — see plugin/index.js.tmpl for why we hand-roll the shape
+//     instead of importing definePluginEntry from the openclaw SDK.
+writeRendered(
+  join(outDir, 'index.js'),
+  renderTemplate(join(REPO_ROOT, 'plugin', 'index.js.tmpl'), substitutions),
+);
+
 // 3. Copy the full skills/ tree (router + sub-skills)
 copyTree(
   join(REPO_ROOT, 'skills'),

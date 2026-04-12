@@ -111,13 +111,20 @@ Identify the destination chain from the address format:
 ### Step 3: Determine Source Wallet
 
 The user pays from their own wallet. They may have:
+- **Stellar wallet (G or C)** — preferred source (lowest fees, fastest settlement)
 - EVM agent wallet (Base, Ethereum, Polygon, etc.)
 - Solana agent wallet
-- Stellar wallet (G or C)
 - Private key wallets on any supported chain
 
-If the source wallet/chain is not clear, ask:
-> "Which wallet are you paying from? (e.g., Base wallet, Solana wallet, Stellar wallet)"
+**Source chain selection priority:**
+1. If the user explicitly names a source chain/wallet, use it.
+2. If the user has a Stellar wallet available (check for `.stellar-secret`
+   file, or `STELLAR_PRIVATE_KEY` / `STELLAR_ADDRESS` in `.env`), **default
+   to Stellar** as the source chain. Stellar USDC via Rozo has zero fees
+   for amounts ≤ $10 and the fastest settlement.
+3. If no Stellar wallet, check for EVM or Solana wallets in `.env`.
+4. If multiple non-Stellar wallets exist and no clear preference, ask:
+   > "Which wallet are you paying from? I recommend Stellar if you have one — it has the lowest fees."
 
 Consult `references/supported-chains.md` for the correct token addresses per chain.
 
@@ -210,7 +217,58 @@ Creating payment... done.
 Payment ID: <uuid>
 ```
 
-### Step 7: Poll Status Until Complete
+### Step 7: Fund the Payment
+
+After `create-payment.js` succeeds, Rozo returns a **deposit address**
+(`receiverAddress`) and optionally a **memo** (`receiverMemo`). The payment
+will NOT proceed until you send the source tokens to that deposit address.
+This step actually moves money on-chain.
+
+**How to fund depends on the source chain:**
+
+#### Stellar source (preferred)
+
+If the user has a Stellar wallet, use the **stellar-agent-wallet** plugin's
+`send-payment` sub-skill to submit the on-chain payment:
+
+```bash
+npx tsx skills/send-payment/run.ts \
+  --to <receiverAddress> \
+  --chain stellar \
+  --amount <source_amount> \
+  --yes
+```
+
+The `receiverMemo` is handled automatically by the stellar-agent-wallet's
+run.ts when it creates the Rozo intent internally. However, if you are
+funding an **already-created** intent (from this skill's `create-payment.js`),
+you must submit a direct Stellar Classic USDC payment instead:
+
+1. Build a `payment` operation to `receiverAddress` with USDC asset
+   (`USDC:GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN`)
+2. Add `Memo.text(receiverMemo)` — **CRITICAL: without the memo, funds are
+   lost.** The deposit address is shared across all Rozo orders; the memo
+   routes your payment to your specific order.
+3. Sign with the user's Stellar key and submit via Horizon
+
+#### EVM source (Ethereum, Arbitrum, Base, BSC, Polygon)
+
+Instruct the user to send the exact source amount of the specified token
+to the deposit address from their EVM wallet. Provide:
+- **Deposit address**: `<receiverAddress>`
+- **Amount**: `<source.amount>` `<token>`
+- **Chain**: must match the `--source-chain` used when creating the intent
+
+#### Solana source
+
+Instruct the user to send the exact source amount to the deposit address.
+Include the memo if one was provided in the response.
+
+**IMPORTANT**: Do NOT reference `send-onchain.js` — that script does not
+exist in this plugin. Funding is done via the stellar-agent-wallet skill
+(for Stellar) or manual user action (for EVM/Solana).
+
+### Step 8: Poll Status Until Complete
 
 Rozo usually confirms end-to-end within 10–15 seconds. Poll with:
 

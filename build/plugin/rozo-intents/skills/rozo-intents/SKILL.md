@@ -11,7 +11,7 @@ description: >
   Do NOT use for general blockchain questions or non-payment tasks.
 metadata:
   author: rozo
-  version: 1.0.3
+  version: 1.0.4
   runtime: node
 ---
 

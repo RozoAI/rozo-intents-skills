@@ -2,7 +2,7 @@
   "id": "rozo-intents",
   "name": "Rozo Intents",
   "description": "Cross-chain crypto payments and bridging via Rozo. Send USDC/USDT across Ethereum, Base, BNB Chain, Solana, and Stellar.",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "configSchema": {
     "type": "object",
     "additionalProperties": false,

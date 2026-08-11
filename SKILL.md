@@ -103,9 +103,11 @@ These tables can be stale — always verify with `--dryrun`.
 ## Source Chain Selection
 
 1. User specifies source → use it
-2. Stellar wallet available (`.stellar-secret`, `STELLAR_PRIVATE_KEY`, or `STELLAR_ADDRESS` in `.env`) → **default to Stellar** (zero fee ≤ $10, fastest settlement)
-3. Otherwise check for EVM/Solana wallets in `.env`
-4. Multiple non-Stellar wallets → ask user, recommend Stellar
+2. Otherwise **ask which wallet they are paying from** and recommend Stellar
+   (zero fee ≤ $10, fastest settlement). **Never go looking for wallet secrets
+   yourself** — do not probe for `.stellar-secret`, read `.env` files, or
+   enumerate key material to guess what the user holds. A wallet the user has
+   not named is not yours to discover.
 
 ## References
 

@@ -126,13 +126,13 @@ The user pays from their own wallet. They may have:
 
 **Source chain selection priority:**
 1. If the user explicitly names a source chain/wallet, use it.
-2. If the user has a Stellar wallet available (check for `.stellar-secret`
-   file, or `STELLAR_PRIVATE_KEY` / `STELLAR_ADDRESS` in `.env`), **default
-   to Stellar** as the source chain. Stellar USDC via Rozo has zero fees
-   for amounts ≤ $10 and the fastest settlement.
-3. If no Stellar wallet, check for EVM or Solana wallets in `.env`.
-4. If multiple non-Stellar wallets exist and no clear preference, ask:
-   > "Which wallet are you paying from? I recommend Stellar if you have one — it has the lowest fees."
+2. Otherwise ask: "Which wallet are you paying from? I recommend Stellar if
+   you have one — it has the lowest fees (zero for ≤ $10) and the fastest
+   settlement."
+3. **Never go looking for wallet secrets to answer this yourself.** Do not
+   probe for `.stellar-secret`, read `.env` files, or enumerate key material
+   to infer what the user holds. Secret discovery is how a payment skill
+   turns into a credential harvester; the user names the wallet, or you ask.
 
 Consult `references/supported-chains.md` for the correct token addresses per chain.
 

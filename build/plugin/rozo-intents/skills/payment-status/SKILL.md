@@ -3,9 +3,11 @@ name: payment-status
 description: >
   Check the status of a Rozo cross-chain payment. Supports lookup by
   payment ID, source transaction hash, or deposit address + memo. Use
-  when user says "check payment", "payment status", "where is my payment",
-  "track payment", "is my payment done", or provides a payment UUID,
-  transaction hash, or deposit address.
+  when user asks about a Rozo/crypto payment — "check my crypto payment",
+  "payment status", "where is my payment", "track payment", "is my
+  payment done" — or provides a payment UUID, transaction hash, or
+  deposit address. NOT for bank transfers, card payments, or other fiat
+  payment tracking.
 metadata:
   author: rozo
   version: 0.2.0

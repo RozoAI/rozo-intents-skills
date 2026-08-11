@@ -3,11 +3,14 @@ name: send-payment
 description: >
   Send cross-chain crypto payments via Rozo API. Handles USDC and USDT
   payouts across EVM chains (Ethereum, Arbitrum, Base, BSC, Polygon), Solana, and
-  Stellar. Use when user says "pay", "send", "transfer", "payout" with
-  crypto amounts, chain names, or wallet addresses. Also handles QR code
-  screenshots containing payment URIs (EIP-681, Solana Pay, Stellar URI).
-  Auto-detects wallet type, auto-selects token (USDC preferred), confirms
-  details before sending.
+  Stellar (Base and Stellar are USDC-only; Solana receives USDC only but can pay in USDT). Use when user says
+  "pay", "send", "transfer", "payout" for crypto/USDC/USDT with crypto
+  amounts, chain names, or wallet addresses — NOT for ordinary fiat
+  payments or bank transfers. Also handles QR code screenshots containing
+  payment URIs (EIP-681, Solana Pay, Stellar URI). Auto-detects wallet
+  type, auto-selects token (USDC preferred). Payments at or below
+  configurable thresholds auto-execute without a yes/no confirmation
+  ($1 silent / $10 narrated by default); only larger amounts prompt.
 metadata:
   author: rozo
   version: 0.1.0
@@ -24,6 +27,11 @@ is `${CLAUDE_PLUGIN_ROOT}`. If that env var isn't set, `cd` to the directory
 that contains `scripts/dist/`, `skills/`, and `.claude-plugin/`.
 
 ## Confirmation Thresholds
+
+**Disclosure: payments at or below these thresholds auto-execute without a
+yes/no confirmation — $1 or less silently, $10 or less with narration only
+(defaults; configurable in `version.json`). Only amounts above the upper
+threshold prompt the user before sending.**
 
 Read `version.json` at the plugin root for the current thresholds:
 
@@ -118,13 +126,13 @@ The user pays from their own wallet. They may have:
 
 **Source chain selection priority:**
 1. If the user explicitly names a source chain/wallet, use it.
-2. If the user has a Stellar wallet available (check for `.stellar-secret`
-   file, or `STELLAR_PRIVATE_KEY` / `STELLAR_ADDRESS` in `.env`), **default
-   to Stellar** as the source chain. Stellar USDC via Rozo has zero fees
-   for amounts ≤ $10 and the fastest settlement.
-3. If no Stellar wallet, check for EVM or Solana wallets in `.env`.
-4. If multiple non-Stellar wallets exist and no clear preference, ask:
-   > "Which wallet are you paying from? I recommend Stellar if you have one — it has the lowest fees."
+2. Otherwise ask: "Which wallet are you paying from? I recommend Stellar if
+   you have one — it has the lowest fees (zero for ≤ $10) and the fastest
+   settlement."
+3. **Never go looking for wallet secrets to answer this yourself.** Do not
+   probe for `.stellar-secret`, read `.env` files, or enumerate key material
+   to infer what the user holds. Secret discovery is how a payment skill
+   turns into a credential harvester; the user names the wallet, or you ask.
 
 Consult `references/supported-chains.md` for the correct token addresses per chain.
 
@@ -143,7 +151,7 @@ The API auto-detects the chain type from the address and returns all token balan
 2. If USDC is insufficient but USDT balance on the source chain is sufficient → use USDT
 3. If neither is sufficient → inform the user and stop
 
-**Note:** USDT payout is only supported on EVM chains (Ethereum, Arbitrum, Base, BSC, Polygon). If the destination is Solana or Stellar and USDC is insufficient, inform the user that only USDC payouts are supported for that chain.
+**Note:** USDT payout is only supported on Ethereum, Arbitrum, BSC, and Polygon. Base is USDC-only (no USDT pay-in or pay-out). If the destination is Base, Solana, or Stellar and USDC is insufficient, inform the user that only USDC payouts are supported for that chain.
 
 After fetching, tell the user their balance:
 > "Your wallet has [X] USDC and [Y] USDT on [chain]. Using [token] for this payment."

@@ -3,7 +3,7 @@ name: rozo-intents
 description: >
   Cross-chain crypto payments and bridging via Rozo. Send USDC/USDT across
   Ethereum, Arbitrum, Base, BNB Chain (BSC), Polygon, Solana, and Stellar
-  (Base, Solana, and Stellar are USDC-only).
+  (Base and Stellar are USDC-only; Solana receives USDC only but can pay in USDT).
   Use when the user asks to pay, send, transfer, or bridge crypto/USDC/USDT,
   check a wallet or USDC/USDT balance, check a crypto payment's status, or
   shares a crypto payment QR code screenshot, a wallet address (0x, base58,
@@ -37,7 +37,7 @@ metadata:
 
 Send cross-chain crypto payments and bridging via Rozo. Send USDC/USDT across
 Ethereum, Arbitrum, Base, BNB Chain (BSC), Polygon, Solana, and Stellar
-(Base, Solana, and Stellar are USDC-only).
+(Base and Stellar are USDC-only; Solana receives USDC only but can pay in USDT).
 
 **Auto-execute disclosure:** payments at or below configurable thresholds
 auto-execute without a yes/no confirmation ($1 silent / $10 narrated by

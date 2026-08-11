@@ -3,7 +3,7 @@ name: send-payment
 description: >
   Send cross-chain crypto payments via Rozo API. Handles USDC and USDT
   payouts across EVM chains (Ethereum, Arbitrum, Base, BSC, Polygon), Solana, and
-  Stellar (Base, Solana, and Stellar are USDC-only). Use when user says
+  Stellar (Base and Stellar are USDC-only; Solana receives USDC only but can pay in USDT). Use when user says
   "pay", "send", "transfer", "payout" for crypto/USDC/USDT with crypto
   amounts, chain names, or wallet addresses — NOT for ordinary fiat
   payments or bank transfers. Also handles QR code screenshots containing

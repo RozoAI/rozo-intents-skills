@@ -9,15 +9,14 @@ description: >
   shares a crypto payment QR code screenshot, a wallet address (0x, base58,
   G/C stellar), or a transaction hash. Auto-detects wallet type and
   auto-selects token (USDC preferred).
-  IMPORTANT: payments at or below configurable thresholds auto-execute
-  WITHOUT a yes/no confirmation — by default $1 or less executes silently
-  and $10 or less executes with narration only; only amounts above $10
-  prompt for confirmation before sending.
+  Every payment shows full details and waits for an explicit yes/no by
+  default. Small-amount auto-execute is opt-in: it runs only if the user
+  raises the confirmation thresholds in version.json (shipped 0 = off).
   Do NOT use for general blockchain questions, non-payment tasks, or
   ordinary fiat payments, bank transfers, or bank-account balance questions.
 metadata:
   author: rozo
-  version: 1.0.7
+  version: 1.0.8
   runtime: node
   permissions:
     network_endpoints:
@@ -27,9 +26,9 @@ metadata:
       referenced in docs only, to locate the plugin root)
     filesystem: none — scripts read/write no files; the agent reads
       version.json for confirmation thresholds
-    spending: creates Rozo payment intents; auto-executes payments at or
-      below the disclosed thresholds ($1 silent / $10 narrated by default),
-      prompts for confirmation above them
+    spending: creates Rozo payment intents; every payment prompts for an
+      explicit yes/no by default. Auto-execute below user-raised thresholds
+      is opt-in via version.json and ships disabled (0/0).
     subprocess: none — scripts run via node with no child processes
 ---
 
@@ -39,9 +38,9 @@ Send cross-chain crypto payments and bridging via Rozo. Send USDC/USDT across
 Ethereum, Arbitrum, Base, BNB Chain (BSC), Polygon, Solana, and Stellar
 (Base and Stellar are USDC-only; Solana receives USDC only but can pay in USDT).
 
-**Auto-execute disclosure:** payments at or below configurable thresholds
-auto-execute without a yes/no confirmation ($1 silent / $10 narrated by
-default — see `version.json`); only larger amounts prompt.
+**Confirmation:** every payment, any amount, shows full details and waits
+for an explicit yes/no. Small-amount auto-execute exists but ships OFF
+(thresholds `0` in `version.json`); it runs only if the user raises them.
 
 ## Routing
 

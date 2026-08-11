@@ -8,9 +8,9 @@ description: >
   amounts, chain names, or wallet addresses — NOT for ordinary fiat
   payments or bank transfers. Also handles QR code screenshots containing
   payment URIs (EIP-681, Solana Pay, Stellar URI). Auto-detects wallet
-  type, auto-selects token (USDC preferred). Payments at or below
-  configurable thresholds auto-execute without a yes/no confirmation
-  ($1 silent / $10 narrated by default); only larger amounts prompt.
+  type, auto-selects token (USDC preferred). Every payment shows full
+  details and waits for an explicit yes/no; small-amount auto-execute is
+  opt-in and ships disabled (thresholds 0 in version.json).
 metadata:
   author: rozo
   version: 0.1.0
@@ -28,15 +28,20 @@ that contains `scripts/dist/`, `skills/`, and `.claude-plugin/`.
 
 ## Confirmation Thresholds
 
-**Disclosure: payments at or below these thresholds auto-execute without a
-yes/no confirmation — $1 or less silently, $10 or less with narration only
-(defaults; configurable in `version.json`). Only amounts above the upper
-threshold prompt the user before sending.**
+**Auto-execute is OFF by default.** Both thresholds ship as `0`: every
+payment, any amount, gets a full summary and an explicit yes/no. A user who
+wants small amounts to run unprompted must raise the thresholds in
+`version.json` themselves — that is the opt-in.
 
 Read `version.json` at the plugin root for the current thresholds:
 
-- `freeConfirmThresholdUsd` (default `1.0`) — silent auto-execute cutoff
-- `singleConfirmThresholdUsd` (default `10.0`) — narrated auto-execute cutoff
+- `freeConfirmThresholdUsd` (default `0` = disabled) — at or below: silent auto-execute
+- `singleConfirmThresholdUsd` (default `0` = disabled) — at or below: narrated auto-execute
+
+**Auto-execute is OFF by default.** With the shipped `0`/`0` every payment,
+any amount, gets the full summary and an explicit yes/no. Raising the
+thresholds in `version.json` is the user's deliberate opt-in; never suggest
+it, just act on the values found.
 
 **Behavior matrix** (the amount below is `destAmount` in USD):
 
@@ -158,12 +163,15 @@ After fetching, tell the user their balance:
 
 ### Step 5: Fee Estimation & Confirmation (amount-dependent)
 
-Look at the thresholds from the "Confirmation Thresholds" section above.
+Read the thresholds from `version.json` (see "Confirmation Thresholds"
+above). **They ship as `0`/`0`, so by default NO amount qualifies for the
+auto-execute branches below** — every payment takes the confirmation path.
+The branches apply only when the user has raised the thresholds themselves.
 
-**If `amount ≤ singleConfirmThresholdUsd`** (default $10):
-- **Skip the dryrun step entirely.** Rozo charges no fee in this range.
+**If `amount ≤ singleConfirmThresholdUsd`** (only possible after user opt-in):
+- **Skip the dryrun step entirely.** Rozo charges no fee at or below $10.
 - **Skip the yes/no question.**
-- If `amount ≤ freeConfirmThresholdUsd` (default $1): stay silent, proceed straight to Step 6.
+- If `amount ≤ freeConfirmThresholdUsd`: stay silent, proceed straight to Step 6.
 - If `freeConfirm < amount ≤ singleConfirm`: narrate what you're doing ("Sending 5 USDC on Base to 0x…, no fee, creating payment now…") but do not ask yes/no. Proceed to Step 6.
 
 **If `amount > singleConfirmThresholdUsd`:**

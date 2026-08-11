@@ -2,23 +2,46 @@
 name: rozo-intents
 description: >
   Cross-chain crypto payments and bridging via Rozo. Send USDC/USDT across
-  Ethereum, Base, BNB Chain, Solana, and Stellar.
-  Use when user says "pay", "send", "transfer", "payout", "check balance",
-  "payment status", or shares a QR code screenshot. Also
-  triggers on wallet addresses (0x, base58, G/C stellar), transaction
-  hashes. Auto-detects wallet type, auto-selects token
-  (USDC preferred), checks balances, gets fees, and confirms before sending.
-  Do NOT use for general blockchain questions or non-payment tasks.
+  Ethereum, Arbitrum, Base, BNB Chain (BSC), Polygon, Solana, and Stellar
+  (Base and Stellar are USDC-only; Solana receives USDC only but can pay in USDT).
+  Use when the user asks to pay, send, transfer, or bridge crypto/USDC/USDT,
+  check a wallet or USDC/USDT balance, check a crypto payment's status, or
+  shares a crypto payment QR code screenshot, a wallet address (0x, base58,
+  G/C stellar), or a transaction hash. Auto-detects wallet type and
+  auto-selects token (USDC preferred).
+  IMPORTANT: payments at or below configurable thresholds auto-execute
+  WITHOUT a yes/no confirmation — by default $1 or less executes silently
+  and $10 or less executes with narration only; only amounts above $10
+  prompt for confirmation before sending.
+  Do NOT use for general blockchain questions, non-payment tasks, or
+  ordinary fiat payments, bank transfers, or bank-account balance questions.
 metadata:
   author: rozo
   version: __VERSION__
   runtime: node
+  permissions:
+    network_endpoints:
+      - intentapiv4.rozo.ai (Rozo payment API — create/get/check payments)
+      - api-balance.rozo-deeplink.workers.dev (Rozo balance API)
+    environment_variables: none read by the scripts (CLAUDE_PLUGIN_ROOT is
+      referenced in docs only, to locate the plugin root)
+    filesystem: none — scripts read/write no files; the agent reads
+      version.json for confirmation thresholds
+    spending: creates Rozo payment intents; auto-executes payments at or
+      below the disclosed thresholds ($1 silent / $10 narrated by default),
+      prompts for confirmation above them
+    subprocess: none — scripts run via node with no child processes
 ---
 
 # Rozo Cross-Chain Payments / Bridging
 
 Send cross-chain crypto payments and bridging via Rozo. Send USDC/USDT across
-  Ethereum, Base, BNB Chain, Solana, and Stellar.
+Ethereum, Arbitrum, Base, BNB Chain (BSC), Polygon, Solana, and Stellar
+(Base and Stellar are USDC-only; Solana receives USDC only but can pay in USDT).
+
+**Auto-execute disclosure:** payments at or below configurable thresholds
+auto-execute without a yes/no confirmation ($1 silent / $10 narrated by
+default — see `version.json`); only larger amounts prompt.
 
 ## Routing
 
@@ -45,7 +68,7 @@ Determine the user's intent and load the matching sub-skill:
 |-------|------|------|
 | Ethereum | Yes | Yes |
 | Arbitrum | Yes | Yes |
-| Base | Yes | Yes |
+| Base | Yes | No |
 | BSC | Yes | Yes |
 | Polygon | Yes | Yes |
 | Solana | Yes | No |
@@ -84,6 +107,12 @@ The Rozo APIs are **public and rate-limited** — no API keys or authentication 
 | Balance API (check balance) | `api-balance.rozo-deeplink.workers.dev` | None (rate-limited) | Rozo balance service (Cloudflare Workers) |
 
 Both hosts are operated by Rozo. The balance endpoint uses a separate Cloudflare Workers deployment for performance.
+
+**Data sent to Rozo:** as part of normal operation, wallet addresses,
+chain/token choices, amounts, memos, and payment IDs are transmitted to
+Rozo's public rate-limited APIs (`intentapiv4.rozo.ai`,
+`api-balance.rozo-deeplink.workers.dev`). No API key is involved. Anyone
+who can observe a payment ID can query that payment's status.
 
 ## Quick Reference
 

@@ -12,6 +12,12 @@ when installed as a plugin. If unset, `cd` to the directory that contains
 
 **No API keys required.** Rozo APIs are public and rate-limited.
 
+**Data sent to Rozo:** wallet addresses, chain/token choices, amounts,
+memos, and payment IDs are transmitted to Rozo's public rate-limited APIs
+(`intentapiv4.rozo.ai`, `api-balance.rozo-deeplink.workers.dev`) as part
+of normal operation. Anyone who can observe a payment ID can query its
+status.
+
 ## Critical Rules
 
 These apply across all sub-skills. Never skip them.
@@ -29,6 +35,10 @@ These apply across all sub-skills. Never skip them.
   `get-payment.js` immediately if status is still pending.
 
 ## Confirmation Thresholds
+
+**Disclosure: payments at or below these thresholds auto-execute without a
+yes/no confirmation ($1 silent / $10 narrated by default); only larger
+amounts prompt the user.**
 
 Read `version.json` for current values (`freeConfirmThresholdUsd` = $1,
 `singleConfirmThresholdUsd` = $10 by default).

@@ -30,7 +30,10 @@ that contains `scripts/dist/`, `skills/`, and `.claude-plugin/`.
 
 **Every transfer this skill creates is irreversible once funded.** Verify
 destination address, chain, token, memo and amount with the user before
-funding; a mistake is not recoverable by Rozo.
+funding; a mistake is not recoverable by Rozo. (If the
+user has deliberately raised the auto-execute thresholds, their standing
+opt-in covers amounts below them — correctness checks still run, but the
+per-payment restatement is not required there.)
 
 ## Confirmation Thresholds
 

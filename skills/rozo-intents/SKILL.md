@@ -49,7 +49,10 @@ for an explicit yes/no. Small-amount auto-execute exists but ships OFF
 **Crypto transfers are irreversible.** Before funding anything, restate and
 have the user verify the destination address, chain, token, memo (Stellar)
 and amount against a source they trust. A payment to a wrong address, wrong
-chain, or without a required memo is not recoverable by Rozo or anyone else.
+chain, or without a required memo is not recoverable by Rozo or anyone else. (If the
+user has deliberately raised the auto-execute thresholds, their standing
+opt-in covers amounts below them — correctness checks still run, but the
+per-payment restatement is not required there.)
 
 ## Routing
 

@@ -66,11 +66,11 @@ describe("PAYOUT_TOKENS", () => {
     expect(PAYOUT_TOKENS.USDC[42161]).toBeDefined();
   });
 
-  it("has USDT on 5 EVM payout chains (including Arbitrum)", () => {
-    expect(Object.keys(PAYOUT_TOKENS.USDT)).toHaveLength(5);
+  it("has USDT on 4 EVM payout chains (no Base — API rejects USDT on 8453)", () => {
+    expect(Object.keys(PAYOUT_TOKENS.USDT)).toHaveLength(4);
     expect(PAYOUT_TOKENS.USDT[1]).toBeDefined();
     expect(PAYOUT_TOKENS.USDT[42161]).toBeDefined();
-    expect(PAYOUT_TOKENS.USDT[8453]).toBeDefined();
+    expect(PAYOUT_TOKENS.USDT[8453]).toBeUndefined();
     expect(PAYOUT_TOKENS.USDT[56]).toBeDefined();
     expect(PAYOUT_TOKENS.USDT[137]).toBeDefined();
   });

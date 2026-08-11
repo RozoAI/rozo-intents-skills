@@ -68,6 +68,15 @@ copyTree(
   join(outDir, 'LICENSE.md'),
 );
 
+// 7. Copy version.json — the docs tell the agent to read the confirmation
+// thresholds from it, so the shipped artifact must actually contain it
+// (thresholds default to 0/0 = every payment confirms; raising them there
+// is the user's opt-in).
+copyTree(
+  join(REPO_ROOT, 'version.json'),
+  join(outDir, 'version.json'),
+);
+
 // 7. Stamp __VERSION__ in the router SKILL.md
 stampVersionInFile(join(outDir, 'SKILL.md'), versionInfo.version);
 

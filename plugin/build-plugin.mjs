@@ -111,6 +111,13 @@ copyTree(
   join(outDir, 'LICENSE.md'),
 );
 
+// version.json ships too: the skill docs direct the agent to read the
+// confirmation thresholds from the plugin root.
+copyTree(
+  join(REPO_ROOT, 'version.json'),
+  join(outDir, 'version.json'),
+);
+
 // 7. Stamp __VERSION__ in the router SKILL.md inside the plugin
 stampVersionInFile(
   join(outDir, 'skills', versionInfo.name, 'SKILL.md'),

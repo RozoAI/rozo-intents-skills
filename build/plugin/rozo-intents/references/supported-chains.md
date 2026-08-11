@@ -22,7 +22,7 @@
 | Solana | 900 | EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v | 6 |
 | Stellar | 1500 | USDC:GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN | 7 |
 
-### USDT Pay-In
+### USDT Pay-In (source; NOT Base — Base is USDC-only in BOTH directions)
 
 | Chain | Chain ID | Token Address | Decimals |
 |-------|----------|--------------|----------|

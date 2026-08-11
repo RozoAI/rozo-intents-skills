@@ -26,6 +26,15 @@ skill's directory. When installed as a Claude Code plugin, the plugin root
 is `${CLAUDE_PLUGIN_ROOT}`. If that env var isn't set, `cd` to the directory
 that contains `scripts/dist/`, `skills/`, and `.claude-plugin/`.
 
+## Irreversibility
+
+**Every transfer this skill creates is irreversible once funded.** Verify
+destination address, chain, token, memo and amount with the user before
+funding; a mistake is not recoverable by Rozo. (If the
+user has deliberately raised the auto-execute thresholds, their standing
+opt-in covers amounts below them — correctness checks still run, but the
+per-payment restatement is not required there.)
+
 ## Confirmation Thresholds
 
 **Auto-execute is OFF by default.** Both thresholds ship as `0`: every

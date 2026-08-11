@@ -75,3 +75,11 @@ User: "What's my balance?" (wallet known from context)
 User: "Show balance for GC56BXCNEWL6JSGKHD3RJ5HJRNKFEJQ53D3YY3SMD6XK7YPDI75BQ7FD"
 
 1. Fetch → display USDC on Stellar
+
+
+## Data sent to Rozo
+
+A balance check transmits the wallet address you supply to Rozo's public
+balance API (`api-balance.rozo-deeplink.workers.dev`). A wallet address is
+financial metadata — it can be correlated with holdings and history — so do
+not send an address the user has not explicitly asked you to check.

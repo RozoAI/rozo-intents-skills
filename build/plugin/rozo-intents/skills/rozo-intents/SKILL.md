@@ -17,7 +17,7 @@ description: >
   ordinary fiat payments, bank transfers, or bank-account balance questions.
 metadata:
   author: rozo
-  version: 1.0.6
+  version: 1.0.7
   runtime: node
   permissions:
     network_endpoints:

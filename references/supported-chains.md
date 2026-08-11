@@ -1,6 +1,14 @@
 # Supported Tokens and Chains
 
-## Pay-In Tokens
+## Direction glossary
+
+- **Pay-In** = the SOURCE side: the chain/token the payer sends FROM.
+- **Pay-Out** = the DESTINATION side: the chain/token the recipient gets.
+- A chain can appear in one direction and not the other. Solana appears under
+  USDT **Pay-In** (you can pay FROM Solana in USDT) but not under USDT
+  **Pay-Out** (a recipient cannot receive USDT on Solana).
+
+## Pay-In Tokens (source — what you can pay FROM)
 
 ### USDC Pay-In
 
@@ -24,7 +32,7 @@
 | Polygon | 137 | 0xc2132d05d31c914a87c6611c10748aeb04b58e8f | 6 |
 | Solana | 900 | Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB | 6 |
 
-## Pay-Out Tokens
+## Pay-Out Tokens (destination — what the recipient gets)
 
 ### USDC Pay-Out
 
@@ -38,7 +46,7 @@
 | Solana | 900 | EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v | 6 |
 | Stellar | 1500 | USDC:GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN | 7 |
 
-### USDT Pay-Out (EVM chains only)
+### USDT Pay-Out (destination — EVM chains only; NOT Solana, NOT Stellar, NOT Base)
 
 | Chain | Chain ID | Token Address | Decimals |
 |-------|----------|--------------|----------|

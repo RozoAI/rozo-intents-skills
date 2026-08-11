@@ -163,12 +163,15 @@ After fetching, tell the user their balance:
 
 ### Step 5: Fee Estimation & Confirmation (amount-dependent)
 
-Look at the thresholds from the "Confirmation Thresholds" section above.
+Read the thresholds from `version.json` (see "Confirmation Thresholds"
+above). **They ship as `0`/`0`, so by default NO amount qualifies for the
+auto-execute branches below** — every payment takes the confirmation path.
+The branches apply only when the user has raised the thresholds themselves.
 
-**If `amount ≤ singleConfirmThresholdUsd`** (default $10):
-- **Skip the dryrun step entirely.** Rozo charges no fee in this range.
+**If `amount ≤ singleConfirmThresholdUsd`** (only possible after user opt-in):
+- **Skip the dryrun step entirely.** Rozo charges no fee at or below $10.
 - **Skip the yes/no question.**
-- If `amount ≤ freeConfirmThresholdUsd` (default $1): stay silent, proceed straight to Step 6.
+- If `amount ≤ freeConfirmThresholdUsd`: stay silent, proceed straight to Step 6.
 - If `freeConfirm < amount ≤ singleConfirm`: narrate what you're doing ("Sending 5 USDC on Base to 0x…, no fee, creating payment now…") but do not ask yes/no. Proceed to Step 6.
 
 **If `amount > singleConfirmThresholdUsd`:**

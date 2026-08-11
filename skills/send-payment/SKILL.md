@@ -8,9 +8,9 @@ description: >
   amounts, chain names, or wallet addresses — NOT for ordinary fiat
   payments or bank transfers. Also handles QR code screenshots containing
   payment URIs (EIP-681, Solana Pay, Stellar URI). Auto-detects wallet
-  type, auto-selects token (USDC preferred). Payments at or below
-  configurable thresholds auto-execute without a yes/no confirmation
-  ($1 silent / $10 narrated by default); only larger amounts prompt.
+  type, auto-selects token (USDC preferred). Every payment shows full
+  details and waits for an explicit yes/no; small-amount auto-execute is
+  opt-in and ships disabled (thresholds 0 in version.json).
 metadata:
   author: rozo
   version: 0.1.0
@@ -28,15 +28,20 @@ that contains `scripts/dist/`, `skills/`, and `.claude-plugin/`.
 
 ## Confirmation Thresholds
 
-**Disclosure: payments at or below these thresholds auto-execute without a
-yes/no confirmation — $1 or less silently, $10 or less with narration only
-(defaults; configurable in `version.json`). Only amounts above the upper
-threshold prompt the user before sending.**
+**Auto-execute is OFF by default.** Both thresholds ship as `0`: every
+payment, any amount, gets a full summary and an explicit yes/no. A user who
+wants small amounts to run unprompted must raise the thresholds in
+`version.json` themselves — that is the opt-in.
 
 Read `version.json` at the plugin root for the current thresholds:
 
-- `freeConfirmThresholdUsd` (default `1.0`) — silent auto-execute cutoff
-- `singleConfirmThresholdUsd` (default `10.0`) — narrated auto-execute cutoff
+- `freeConfirmThresholdUsd` (default `0` = disabled) — at or below: silent auto-execute
+- `singleConfirmThresholdUsd` (default `0` = disabled) — at or below: narrated auto-execute
+
+**Auto-execute is OFF by default.** With the shipped `0`/`0` every payment,
+any amount, gets the full summary and an explicit yes/no. Raising the
+thresholds in `version.json` is the user's deliberate opt-in; never suggest
+it, just act on the values found.
 
 **Behavior matrix** (the amount below is `destAmount` in USD):
 

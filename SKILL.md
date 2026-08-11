@@ -36,18 +36,19 @@ These apply across all sub-skills. Never skip them.
 
 ## Confirmation Thresholds
 
-**Disclosure: payments at or below these thresholds auto-execute without a
-yes/no confirmation ($1 silent / $10 narrated by default); only larger
-amounts prompt the user.**
+**Auto-execute is OFF by default.** Both thresholds ship as `0`, so every
+payment — any amount — shows full details and waits for an explicit yes/no.
+Skipping confirmation for small amounts is strictly opt-in: the user must
+themselves raise `freeConfirmThresholdUsd` / `singleConfirmThresholdUsd` in
+`version.json`. Never suggest raising them; act on the values found.
 
-Read `version.json` for current values (`freeConfirmThresholdUsd` = $1,
-`singleConfirmThresholdUsd` = $10 by default).
+Read `version.json` for current values (both default `0` = disabled).
 
 | Amount | Behavior |
 |---|---|
-| ≤ $1 | Silent auto-execute, one-line result only |
-| ≤ $10 | Narrated auto-execute, no yes/no prompt, **skip dryrun** (fee = $0) |
-| > $10 | Run `--dryrun` for exact fee, full summary + yes/no confirmation |
+| ≤ `freeConfirm` (user-raised) | Silent auto-execute, one-line result only |
+| ≤ `singleConfirm` (user-raised) | Narrated auto-execute, no yes/no prompt, **skip dryrun** (fee = $0) |
+| everything else (all amounts at the `0` defaults) | Run `--dryrun` for exact fee, full summary + yes/no confirmation |
 
 Chain ambiguity is **never** skipped regardless of amount.
 

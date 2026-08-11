@@ -4,8 +4,10 @@ description: >
   Check wallet USDC and USDT balances across all supported chains via the
   Rozo balance API. Supports EVM wallets (Ethereum, Arbitrum, Base, BSC,
   Polygon), Solana, and Stellar (G-wallet and C-wallet). Use when user
-  says "check balance", "how much do I have", "show my balance", "wallet
-  balance", or "what's my USDC balance". Auto-detects chain from address.
+  asks to check a crypto wallet balance — "check my wallet balance",
+  "how much USDC/USDT do I have", "what's my USDC balance" — or provides
+  a wallet address. NOT for bank-account or fiat balance questions.
+  Auto-detects chain from address.
 metadata:
   author: rozo
   version: 0.1.0

@@ -25,7 +25,7 @@ const emptyConfigSchema = {
 export default {
   id: "rozo-intents",
   name: "Rozo Intents",
-  description: "Cross-chain crypto payments and bridging via Rozo. Send USDC/USDT across Ethereum, Base, BNB Chain, Solana, and Stellar.",
+  description: "Cross-chain crypto payments and bridging via Rozo. Send USDC/USDT across Ethereum, Arbitrum, Base, BNB Chain (BSC), Polygon, Solana, and Stellar (Base and Stellar are USDC-only; Solana receives USDC only but can pay in USDT).",
   get configSchema() {
     return emptyConfigSchema;
   },

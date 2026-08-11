@@ -44,13 +44,13 @@
 |-------|----------|--------------|----------|
 | Ethereum | 1 | 0xdac17f958d2ee523a2206206994597c13d831ec7 | 6 |
 | Arbitrum | 42161 | 0xfd086bc7cd5c481dcc9c85ebe478a1c0b69fcbb9 | 6 |
-| Base | 8453 | 0x833589fcd6edb6e08f4c7c32d4f71b54bda02913 | 6 |
 | BSC | 56 | 0x55d398326f99059ff775485246999027b3197955 | 18 |
 | Polygon | 137 | 0xc2132d05d31c914a87c6611c10748aeb04b58e8f | 6 |
 
 ## Important Notes
 
-- **USDT payout supported on EVM chains** — Ethereum, Arbitrum, Base, BSC, Polygon
+- **USDT payout supported on EVM chains** — Ethereum, Arbitrum, BSC, Polygon
+- **Base is USDC-only** — USDT is not supported on Base for pay-in or pay-out
 - **USDT payout NOT supported on Solana or Stellar**
 - **BSC uses 18 decimals** for both USDC and USDT (different from other chains)
 - **Stellar uses 7 decimals** for USDC

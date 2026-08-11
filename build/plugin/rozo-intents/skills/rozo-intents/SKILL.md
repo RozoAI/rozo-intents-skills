@@ -3,7 +3,9 @@ name: rozo-intents
 description: >
   Cross-chain crypto payments and bridging via Rozo. Send USDC/USDT across
   Ethereum, Arbitrum, Base, BNB Chain (BSC), Polygon, Solana, and Stellar
-  (Base and Stellar are USDC-only; Solana receives USDC only but can pay in USDT).
+  (Base and Stellar are USDC-only; Solana receives USDC only but can pay in
+  USDT). On Stellar the trustline checker can also verify EURC trustlines;
+  EURC is trustline-verification only, never a payment token here.
   Use when the user asks to pay, send, transfer, or bridge crypto/USDC/USDT,
   check a wallet or USDC/USDT balance, check a crypto payment's status, or
   shares a crypto payment QR code screenshot, a wallet address (0x, base58,
@@ -16,7 +18,7 @@ description: >
   ordinary fiat payments, bank transfers, or bank-account balance questions.
 metadata:
   author: rozo
-  version: 1.0.8
+  version: 1.0.9
   runtime: node
   permissions:
     network_endpoints:
@@ -41,6 +43,13 @@ Ethereum, Arbitrum, Base, BNB Chain (BSC), Polygon, Solana, and Stellar
 **Confirmation:** every payment, any amount, shows full details and waits
 for an explicit yes/no. Small-amount auto-execute exists but ships OFF
 (thresholds `0` in `version.json`); it runs only if the user raises them.
+
+## Before any payment
+
+**Crypto transfers are irreversible.** Before funding anything, restate and
+have the user verify the destination address, chain, token, memo (Stellar)
+and amount against a source they trust. A payment to a wrong address, wrong
+chain, or without a required memo is not recoverable by Rozo or anyone else.
 
 ## Routing
 

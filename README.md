@@ -120,3 +120,7 @@ the version field to invalidate installed users' caches.
 ## License
 
 [MIT-0](./LICENSE.md) — do whatever you want.
+
+## Secret scanning
+
+Enable the local gitleaks pre-commit hook once per clone: `brew install gitleaks pre-commit && pre-commit install` (config in `.pre-commit-config.yaml`). CI also runs a report-only scan in `.github/workflows/secret-scan.yml`.

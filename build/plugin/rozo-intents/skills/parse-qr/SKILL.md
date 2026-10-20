@@ -53,7 +53,13 @@ Show the extracted fields:
 - **Address**: recipient wallet
 - **Chain**: detected chain (or ask if EVM)
 - **Token**: USDC/USDT if detected from contract address
-- **Amount**: if present in the URI
+- **Amount**: use `tokenAmount` (whole tokens, e.g. `1.5` USDC). The raw
+  `amount` field is exactly what the URI says: EIP-681 writes base units
+  (`uint256=1000000` is 1 USDC on Base, while BSC USDC/USDT use 18 decimals),
+  Solana Pay and Stellar write whole tokens. Never convert `amount` yourself.
+  If `amount` is present but `tokenAmount` is missing (unknown token or a
+  malformed value), do not guess the decimals: show the raw value and ask the
+  user to confirm the amount.
 
 If the QR contains a full payment request (address + amount + token), offer to proceed with payment using the `send-payment` skill.
 
@@ -64,7 +70,7 @@ If the QR contains only an address, ask the user for the amount.
 ### Example 1: EIP-681 ERC-20
 QR content: `ethereum:0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913/transfer?address=0x5aAe...&uint256=1000000`
 
-Parsed: Base USDC, recipient 0x5aAe..., 1.00 USDC (1000000 raw, 6 decimals)
+Parsed: Base USDC, recipient 0x5aAe..., `tokenAmount` 1 USDC (`amount` 1000000 raw, `decimals` 6)
 
 ### Example 2: Solana Pay with USDC
 QR content: `solana:9wFF...?amount=10.25&spl-token=EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v`

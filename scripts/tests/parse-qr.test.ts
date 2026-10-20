@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { parseQR } from "../src/parse-qr.js";
+import { parseQR, formatBaseUnits } from "../src/parse-qr.js";
 import {
   TEST_EVM_ADDRESS,
   TEST_EVM_ADDRESS_2,
@@ -197,6 +197,89 @@ describe("parseQR", () => {
 
     it("returns null for empty string", () => {
       expect(parseQR("")).toBeNull();
+    });
+  });
+
+  // --- Token amounts ---
+  describe("tokenAmount", () => {
+    it("converts EIP-681 base units using the token's decimals (Base USDC, 6)", () => {
+      const r = parseQR(
+        `ethereum:0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913/transfer?address=${TEST_EVM_ADDRESS}&uint256=1000000`
+      );
+      expect(r!.amount).toBe("1000000");
+      expect(r!.decimals).toBe(6);
+      expect(r!.tokenAmount).toBe("1");
+    });
+
+    it("uses 18 decimals for BSC USDC and USDT, not 6", () => {
+      const usdc = parseQR(
+        `ethereum:0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d/transfer?address=${TEST_EVM_ADDRESS}&uint256=5000000000000000000`
+      );
+      expect(usdc!.chainId).toBe(56);
+      expect(usdc!.decimals).toBe(18);
+      expect(usdc!.tokenAmount).toBe("5");
+
+      const usdt = parseQR(
+        `ethereum:0x55d398326f99059fF775485246999027B3197955/transfer?address=${TEST_EVM_ADDRESS}&uint256=2.5e18`
+      );
+      expect(usdt!.tokenAmount).toBe("2.5");
+    });
+
+    it("reads scientific notation in base units", () => {
+      const r = parseQR(
+        `ethereum:0xdAC17F958D2ee523a2206206994597C13D831ec7/transfer?address=${TEST_EVM_ADDRESS_2}&uint256=1.25e7`
+      );
+      expect(r!.tokenAmount).toBe("12.5");
+    });
+
+    it("leaves tokenAmount unset for unknown ERC-20 contracts", () => {
+      const r = parseQR(
+        `ethereum:0x6B175474E89094C44Da98b954EedeAC495271d0F@10/transfer?address=${TEST_EVM_ADDRESS_2}&uint256=42`
+      );
+      expect(r!.amount).toBe("42");
+      expect(r!.decimals).toBeUndefined();
+      expect(r!.tokenAmount).toBeUndefined();
+    });
+
+    it("converts native value from wei", () => {
+      const r = parseQR(`ethereum:${TEST_EVM_ADDRESS_2}@1?value=1.5e18`);
+      expect(r!.decimals).toBe(18);
+      expect(r!.tokenAmount).toBe("1.5");
+    });
+
+    it("passes Solana Pay and Stellar decimal amounts through", () => {
+      expect(
+        parseQR(`solana:${TEST_SOLANA_ADDRESS_2}?amount=10.25&spl-token=EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v`)!
+          .tokenAmount
+      ).toBe("10.25");
+      expect(
+        parseQR(`web+stellar:pay?destination=${TEST_STELLAR_G_ADDRESS}&amount=100&asset_code=USDC`)!.tokenAmount
+      ).toBe("100");
+    });
+
+    it("does not report a tokenAmount for malformed amounts", () => {
+      expect(parseQR(`solana:${TEST_SOLANA_ADDRESS_2}?amount=1e3`)!.tokenAmount).toBeUndefined();
+      expect(
+        parseQR(
+          `ethereum:0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913/transfer?address=${TEST_EVM_ADDRESS}&uint256=0x10`
+        )!.tokenAmount
+      ).toBeUndefined();
+    });
+  });
+
+  describe("formatBaseUnits", () => {
+    it("formats exactly and trims trailing zeros", () => {
+      expect(formatBaseUnits("1234567", 6)).toBe("1.234567");
+      expect(formatBaseUnits("1000", 6)).toBe("0.001");
+      expect(formatBaseUnits("0", 6)).toBe("0");
+      expect(formatBaseUnits("2.014e18", 18)).toBe("2.014");
+      expect(formatBaseUnits("123456789012345678901234567890", 18)).toBe("123456789012.34567890123456789");
+    });
+
+    it("rejects fractional base units and malformed input", () => {
+      expect(formatBaseUnits("1.5", 6)).toBeUndefined();
+      expect(formatBaseUnits("-1", 6)).toBeUndefined();
+      expect(formatBaseUnits("abc", 6)).toBeUndefined();
     });
   });
 });

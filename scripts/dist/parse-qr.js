@@ -15,21 +15,46 @@ const EIP681_CHAIN_MAP = {
     56: 56, // BSC
     137: 137, // Polygon
 };
-// Known ERC-20 token contract → symbol mapping (lowercase)
+// Known ERC-20 token contract → symbol mapping (lowercase).
+// Decimals match chains.ts; note the BSC tokens use 18, not 6.
 const EVM_TOKEN_CONTRACTS = {
     // USDC
-    "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48": { symbol: "USDC", chainId: 1 },
-    "0xaf88d065e77c8cc2239327c5edb3a432268e5831": { symbol: "USDC", chainId: 42161 },
-    "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913": { symbol: "USDC", chainId: 8453 },
-    "0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d": { symbol: "USDC", chainId: 56 },
-    "0x3c499c542cef5e3811e1192ce70d8cc03d5c3359": { symbol: "USDC", chainId: 137 },
+    "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48": { symbol: "USDC", chainId: 1, decimals: 6 },
+    "0xaf88d065e77c8cc2239327c5edb3a432268e5831": { symbol: "USDC", chainId: 42161, decimals: 6 },
+    "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913": { symbol: "USDC", chainId: 8453, decimals: 6 },
+    "0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d": { symbol: "USDC", chainId: 56, decimals: 18 },
+    "0x3c499c542cef5e3811e1192ce70d8cc03d5c3359": { symbol: "USDC", chainId: 137, decimals: 6 },
     // USDT
-    "0xdac17f958d2ee523a2206206994597c13d831ec7": { symbol: "USDT", chainId: 1 },
-    "0xfd086bc7cd5c481dcc9c85ebe478a1c0b69fcbb9": { symbol: "USDT", chainId: 42161 },
-    "0xfde4c96c8593536e31f229ea8f37b2ada2699bb2": { symbol: "USDT", chainId: 8453 },
-    "0x55d398326f99059ff775485246999027b3197955": { symbol: "USDT", chainId: 56 },
-    "0xc2132d05d31c914a87c6611c10748aeb04b58e8f": { symbol: "USDT", chainId: 137 },
+    "0xdac17f958d2ee523a2206206994597c13d831ec7": { symbol: "USDT", chainId: 1, decimals: 6 },
+    "0xfd086bc7cd5c481dcc9c85ebe478a1c0b69fcbb9": { symbol: "USDT", chainId: 42161, decimals: 6 },
+    "0xfde4c96c8593536e31f229ea8f37b2ada2699bb2": { symbol: "USDT", chainId: 8453, decimals: 6 },
+    "0x55d398326f99059ff775485246999027b3197955": { symbol: "USDT", chainId: 56, decimals: 18 },
+    "0xc2132d05d31c914a87c6611c10748aeb04b58e8f": { symbol: "USDT", chainId: 137, decimals: 6 },
 };
+// Native EVM assets (ETH, BNB, POL) all use 18 decimals.
+const EVM_NATIVE_DECIMALS = 18;
+/**
+ * Convert an EIP-681 base-unit amount ("1000000", "1e18", "2.014e18") to a
+ * decimal string in whole tokens, exactly. Returns undefined if the value is
+ * malformed or does not resolve to a whole number of base units.
+ */
+export function formatBaseUnits(raw, decimals) {
+    const match = raw.match(/^(\d+)(?:\.(\d+))?(?:[eE]\+?(\d+))?$/);
+    if (!match)
+        return undefined;
+    const [, intPart, fracPart = "", expPart = "0"] = match;
+    const exponent = Number(expPart);
+    if (fracPart.length > exponent)
+        return undefined; // fractional base units
+    const units = BigInt(intPart + fracPart.padEnd(exponent, "0"));
+    const scale = 10n ** BigInt(decimals);
+    const whole = units / scale;
+    const fraction = (units % scale).toString().padStart(decimals, "0").replace(/0+$/, "");
+    return fraction ? `${whole}.${fraction}` : whole.toString();
+}
+function isDecimalAmount(value) {
+    return value !== null && /^\d+(\.\d+)?$/.test(value);
+}
 // Solana SPL token mint → symbol mapping
 const SOLANA_TOKEN_MINTS = {
     "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v": "USDC",
@@ -59,15 +84,20 @@ function parseEIP681(uri) {
             token: tokenInfo?.symbol,
             tokenAddress: addressOrContract,
             amount: rawAmount ?? undefined,
+            decimals: tokenInfo?.decimals,
+            tokenAmount: tokenInfo && rawAmount ? formatBaseUnits(rawAmount, tokenInfo.decimals) : undefined,
             raw: uri,
         };
     }
     // Simple ETH/native transfer with value (we note it but it's not a stablecoin transfer)
+    const value = params.get("value");
     return {
         type: "eip681",
         address: addressOrContract,
         chainId,
-        amount: params.get("value") ?? undefined,
+        amount: value ?? undefined,
+        decimals: value ? EVM_NATIVE_DECIMALS : undefined,
+        tokenAmount: value ? formatBaseUnits(value, EVM_NATIVE_DECIMALS) : undefined,
         raw: uri,
     };
 }
@@ -79,13 +109,16 @@ function parseSolanaPay(uri) {
     const [, address, queryStr] = match;
     const params = new URLSearchParams(queryStr ?? "");
     const splToken = params.get("spl-token");
+    const amount = params.get("amount");
     return {
         type: "solana-pay",
         address,
         chainId: 900,
         token: splToken ? SOLANA_TOKEN_MINTS[splToken] : undefined,
         tokenAddress: splToken ?? undefined,
-        amount: params.get("amount") ?? undefined,
+        amount: amount ?? undefined,
+        // Solana Pay amounts are already decimal token amounts.
+        tokenAmount: isDecimalAmount(amount) ? amount : undefined,
         memo: params.get("memo") ?? undefined,
         label: params.get("label") ?? undefined,
         message: params.get("message") ?? undefined,
@@ -102,12 +135,15 @@ function parseStellarURI(uri) {
     if (!destination)
         return null;
     const assetCode = params.get("asset_code");
+    const amount = params.get("amount");
     return {
         type: "stellar-uri",
         address: destination,
         chainId: 1500,
         token: assetCode ?? undefined,
-        amount: params.get("amount") ?? undefined,
+        amount: amount ?? undefined,
+        // SEP-7 amounts are already decimal token amounts.
+        tokenAmount: isDecimalAmount(amount) ? amount : undefined,
         memo: params.get("memo") ?? undefined,
         raw: uri,
     };

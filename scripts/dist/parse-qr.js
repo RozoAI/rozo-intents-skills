@@ -33,17 +33,27 @@ const EVM_TOKEN_CONTRACTS = {
 };
 // Native EVM assets (ETH, BNB, POL) all use 18 decimals.
 const EVM_NATIVE_DECIMALS = 18;
+// uint256 has at most 78 decimal digits; anything longer is not a valid amount.
+const MAX_UINT256_DIGITS = 78;
 /**
  * Convert an EIP-681 base-unit amount ("1000000", "1e18", "2.014e18") to a
  * decimal string in whole tokens, exactly. Returns undefined if the value is
- * malformed or does not resolve to a whole number of base units.
+ * malformed, larger than a uint256, or does not resolve to a whole number of
+ * base units.
  */
 export function formatBaseUnits(raw, decimals) {
     const match = raw.match(/^(\d+)(?:\.(\d+))?(?:[eE]\+?(\d+))?$/);
     if (!match)
         return undefined;
-    const [, intPart, fracPart = "", expPart = "0"] = match;
+    const [, intPart, rawFracPart = "", expPart = "0"] = match;
+    const fracPart = rawFracPart.replace(/0+$/, ""); // "1000000.0" is still whole
     const exponent = Number(expPart);
+    // Bound the expansion before padding: untrusted input like "1e999999999"
+    // must not allocate a huge string.
+    const significantIntDigits = intPart.replace(/^0+/, "").length;
+    if (exponent > MAX_UINT256_DIGITS || significantIntDigits + exponent > MAX_UINT256_DIGITS) {
+        return undefined;
+    }
     if (fracPart.length > exponent)
         return undefined; // fractional base units
     const units = BigInt(intPart + fracPart.padEnd(exponent, "0"));
@@ -76,7 +86,10 @@ function parseEIP681(uri) {
         if (!recipient)
             return null;
         const contractLower = addressOrContract.toLowerCase();
-        const tokenInfo = EVM_TOKEN_CONTRACTS[contractLower];
+        const knownToken = EVM_TOKEN_CONTRACTS[contractLower];
+        // A QR that names a chain the contract is not deployed on is contradictory
+        // (e.g. Base USDC with @56): don't label it or apply that token's decimals.
+        const tokenInfo = knownToken && (chainId === undefined || chainId === knownToken.chainId) ? knownToken : undefined;
         return {
             type: "eip681",
             address: recipient,

@@ -27,7 +27,8 @@ export interface ParsedQR {
 /**
  * Convert an EIP-681 base-unit amount ("1000000", "1e18", "2.014e18") to a
  * decimal string in whole tokens, exactly. Returns undefined if the value is
- * malformed or does not resolve to a whole number of base units.
+ * malformed, larger than a uint256, or does not resolve to a whole number of
+ * base units.
  */
 export declare function formatBaseUnits(raw: string, decimals: number): string | undefined;
 export declare function parseQR(content: string): ParsedQR | null;

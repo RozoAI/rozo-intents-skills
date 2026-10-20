@@ -267,6 +267,19 @@ describe("parseQR", () => {
     });
   });
 
+  describe("chain mismatch", () => {
+    it("does not apply token metadata when the QR names a different chain than the contract", () => {
+      const r = parseQR(
+        `ethereum:0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913@56/transfer?address=${TEST_EVM_ADDRESS}&uint256=1000000`
+      );
+      expect(r!.chainId).toBe(56);
+      expect(r!.token).toBeUndefined();
+      expect(r!.decimals).toBeUndefined();
+      expect(r!.tokenAmount).toBeUndefined();
+      expect(r!.amount).toBe("1000000");
+    });
+  });
+
   describe("formatBaseUnits", () => {
     it("formats exactly and trims trailing zeros", () => {
       expect(formatBaseUnits("1234567", 6)).toBe("1.234567");
@@ -274,6 +287,19 @@ describe("parseQR", () => {
       expect(formatBaseUnits("0", 6)).toBe("0");
       expect(formatBaseUnits("2.014e18", 18)).toBe("2.014");
       expect(formatBaseUnits("123456789012345678901234567890", 18)).toBe("123456789012.34567890123456789");
+    });
+
+    it("accepts whole values written with fractional zeroes", () => {
+      expect(formatBaseUnits("1000000.0", 6)).toBe("1");
+      expect(formatBaseUnits("1.0e0", 6)).toBe("0.000001");
+      expect(formatBaseUnits("2.50e6", 6)).toBe("2.5");
+    });
+
+    it("rejects amounts larger than uint256 without expanding them", () => {
+      expect(formatBaseUnits("1e999999999", 18)).toBeUndefined();
+      expect(formatBaseUnits("1e79", 18)).toBeUndefined();
+      expect(formatBaseUnits("12e77", 18)).toBeUndefined();
+      expect(formatBaseUnits("1e77", 18)).toBe("1" + "0".repeat(59));
     });
 
     it("rejects fractional base units and malformed input", () => {

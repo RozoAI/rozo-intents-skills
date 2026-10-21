@@ -85,7 +85,7 @@ The user may provide payment info as text OR as a QR code screenshot.
    node scripts/dist/parse-qr.js "<qr_content>"
    ```
 3. The parser handles: EIP-681 (`ethereum:...`), Solana Pay (`solana:...`), Stellar URI (`web+stellar:pay?...`), and plain addresses
-4. Extract address, chain, token, and amount from the parsed result
+4. Extract address, chain, token, and amount from the parsed result. The amount is `tokenAmount`, never the raw `amount`; if `tokenAmount` is missing, get a valid amount from the user as the parse-qr skill describes before going on
 
 **If the user provides text:**
 Extract from the user's message:

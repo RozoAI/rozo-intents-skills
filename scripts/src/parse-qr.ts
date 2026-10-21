@@ -56,7 +56,14 @@ const EVM_TOKEN_CONTRACTS: Record<string, { symbol: string; chainId: number; dec
 const EVM_NATIVE_DECIMALS = 18;
 
 // uint256 has at most 78 decimal digits; anything longer is not a valid amount.
+// The digit count is a cheap guard before expanding; MAX_UINT256 is the exact limit.
 const MAX_UINT256_DIGITS = 78;
+const MAX_UINT256 = 2n ** 256n - 1n;
+
+// Solana Pay: a SOL amount has at most 9 decimals; an SPL token amount at most
+// the mint's decimals. SEP-7: every Stellar amount has at most 7 decimals.
+const SOLANA_NATIVE_DECIMALS = 9;
+const STELLAR_DECIMALS = 7;
 
 /**
  * Convert an EIP-681 base-unit amount ("1000000", "1e18", "2.014e18") to a
@@ -78,6 +85,7 @@ export function formatBaseUnits(raw: string, decimals: number): string | undefin
   }
   if (fracPart.length > exponent) return undefined; // fractional base units
   const units = BigInt(intPart + fracPart.padEnd(exponent, "0"));
+  if (units > MAX_UINT256) return undefined;
   const scale = 10n ** BigInt(decimals);
   const whole = units / scale;
   const fraction = (units % scale).toString().padStart(decimals, "0").replace(/0+$/, "");
@@ -88,10 +96,28 @@ function isDecimalAmount(value: string | null): value is string {
   return value !== null && /^\d+(\.\d+)?$/.test(value);
 }
 
+/**
+ * A decimal token amount (Solana Pay, SEP-7) as-is, or undefined if it is
+ * malformed or has more fractional digits than the asset supports, since such
+ * an amount cannot be paid exactly. `maxDecimals` undefined means unknown.
+ */
+function decimalTokenAmount(value: string | null, maxDecimals?: number): string | undefined {
+  if (!isDecimalAmount(value)) return undefined;
+  const fraction = value.split(".")[1]?.replace(/0+$/, "") ?? "";
+  if (maxDecimals !== undefined && fraction.length > maxDecimals) return undefined;
+  return value;
+}
+
 // Solana SPL token mint → symbol mapping
 const SOLANA_TOKEN_MINTS: Record<string, string> = {
   "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v": "USDC",
   "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB": "USDT",
+};
+
+// Decimals of the mints above (both 6, as in chains.ts).
+const SOLANA_TOKEN_DECIMALS: Record<string, number> = {
+  "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v": 6,
+  "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB": 6,
 };
 
 function parseEIP681(uri: string): ParsedQR | null {
@@ -161,8 +187,12 @@ function parseSolanaPay(uri: string): ParsedQR | null {
     token: splToken ? SOLANA_TOKEN_MINTS[splToken] : undefined,
     tokenAddress: splToken ?? undefined,
     amount: amount ?? undefined,
-    // Solana Pay amounts are already decimal token amounts.
-    tokenAmount: isDecimalAmount(amount) ? amount : undefined,
+    // Solana Pay amounts are already decimal token amounts. An unknown SPL
+    // mint's decimals are not known here, so only the format is checked.
+    tokenAmount: decimalTokenAmount(
+      amount,
+      splToken ? SOLANA_TOKEN_DECIMALS[splToken] : SOLANA_NATIVE_DECIMALS
+    ),
     memo: params.get("memo") ?? undefined,
     label: params.get("label") ?? undefined,
     message: params.get("message") ?? undefined,
@@ -189,7 +219,7 @@ function parseStellarURI(uri: string): ParsedQR | null {
     token: assetCode ?? undefined,
     amount: amount ?? undefined,
     // SEP-7 amounts are already decimal token amounts.
-    tokenAmount: isDecimalAmount(amount) ? amount : undefined,
+    tokenAmount: decimalTokenAmount(amount, STELLAR_DECIMALS),
     memo: params.get("memo") ?? undefined,
     raw: uri,
   };

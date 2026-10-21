@@ -267,6 +267,43 @@ describe("parseQR", () => {
     });
   });
 
+  describe("decimal amounts beyond the asset's precision", () => {
+    const SOL_USDC = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v";
+
+    it("rejects a Solana USDC amount with more than 6 decimals", () => {
+      const r = parseQR(`solana:${TEST_SOLANA_ADDRESS_2}?amount=1.0000001&spl-token=${SOL_USDC}`);
+      expect(r!.tokenAmount).toBeUndefined();
+      expect(r!.amount).toBe("1.0000001");
+    });
+
+    it("keeps a Solana USDC amount at 6 decimals, ignoring trailing zeros", () => {
+      expect(
+        parseQR(`solana:${TEST_SOLANA_ADDRESS_2}?amount=1.000001&spl-token=${SOL_USDC}`)!.tokenAmount
+      ).toBe("1.000001");
+      expect(
+        parseQR(`solana:${TEST_SOLANA_ADDRESS_2}?amount=1.50000000&spl-token=${SOL_USDC}`)!.tokenAmount
+      ).toBe("1.50000000");
+    });
+
+    it("allows up to 9 decimals for a native SOL amount", () => {
+      expect(parseQR(`solana:${TEST_SOLANA_ADDRESS_2}?amount=0.000000001`)!.tokenAmount).toBe("0.000000001");
+      expect(parseQR(`solana:${TEST_SOLANA_ADDRESS_2}?amount=0.0000000001`)!.tokenAmount).toBeUndefined();
+    });
+
+    it("rejects a Stellar amount with more than 7 decimals", () => {
+      expect(
+        parseQR(
+          `web+stellar:pay?destination=${TEST_STELLAR_G_ADDRESS}&amount=1.00000001&asset_code=USDC`
+        )!.tokenAmount
+      ).toBeUndefined();
+      expect(
+        parseQR(
+          `web+stellar:pay?destination=${TEST_STELLAR_G_ADDRESS}&amount=1.0000001&asset_code=USDC`
+        )!.tokenAmount
+      ).toBe("1.0000001");
+    });
+  });
+
   describe("chain mismatch", () => {
     it("does not apply token metadata when the QR names a different chain than the contract", () => {
       const r = parseQR(
@@ -300,6 +337,13 @@ describe("parseQR", () => {
       expect(formatBaseUnits("1e79", 18)).toBeUndefined();
       expect(formatBaseUnits("12e77", 18)).toBeUndefined();
       expect(formatBaseUnits("1e77", 18)).toBe("1" + "0".repeat(59));
+    });
+
+    it("rejects values above uint256 max that fit in 78 digits", () => {
+      const max = 2n ** 256n - 1n;
+      expect(formatBaseUnits(max.toString(), 0)).toBe(max.toString());
+      expect(formatBaseUnits((max + 1n).toString(), 6)).toBeUndefined();
+      expect(formatBaseUnits("9".repeat(78), 6)).toBeUndefined();
     });
 
     it("rejects fractional base units and malformed input", () => {

@@ -57,9 +57,12 @@ Show the extracted fields:
   `amount` field is exactly what the URI says: EIP-681 writes base units
   (`uint256=1000000` is 1 USDC on Base, while BSC USDC/USDT use 18 decimals),
   Solana Pay and Stellar write whole tokens. Never convert `amount` yourself.
-  If `amount` is present but `tokenAmount` is missing (unknown token or a
-  malformed value), do not guess the decimals: show the raw value and ask the
-  user to confirm the amount.
+  If `amount` is present but `tokenAmount` is missing (unknown token, a
+  malformed value, or more decimals than the token supports), do not guess
+  the decimals and do not proceed with the raw value. Show it, ask the user
+  for the amount in whole tokens, and before offering to pay check that the
+  reply has no more decimals than the token supports (Solana USDC/USDT: 6,
+  SOL: 9, Stellar: 7, EVM: the token's `decimals`).
 
 If the QR contains a full payment request (address + amount + token), offer to proceed with payment using the `send-payment` skill.
 
